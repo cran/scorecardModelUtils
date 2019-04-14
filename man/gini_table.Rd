@@ -5,7 +5,7 @@
 \title{Performance measure table with Gini coefficient, KS-statistics and Gini lift curve}
 \usage{
 gini_table(base, target, col_pred = F, model = F, brk = F,
-  quantile_pt = 10)
+  quantile_pt = 10, event_rate_direction = "decreasing")
 }
 \arguments{
 \item{base}{input dataframe}
@@ -19,6 +19,8 @@ gini_table(base, target, col_pred = F, model = F, brk = F,
 \item{brk}{(optional) array of break points of predicted value (default value is FALSE)}
 
 \item{quantile_pt}{(optional) number of quantiles to divide the predicted value range (default value is 10)}
+
+\item{event_rate_direction}{(optional) directionality of event rate with increasing value of predicted column, to be chosen among "increasing" or "decreasing" (default value is decreasing)}
 }
 \value{
 An object of class "gini_table" is a list containing the following components:
@@ -41,8 +43,10 @@ The function takes a dataframe along with a model or the name of a column with p
 \examples{
 data <- iris
 data$Species <- as.character(data$Species)
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y_pred <- sample(300:900,size=nrow(data),replace=TRUE)
 gini_tab_list <- gini_table(base = data,target = "Y",col_pred = "Y_pred",quantile_pt = 10)

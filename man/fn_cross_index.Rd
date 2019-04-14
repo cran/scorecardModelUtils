@@ -20,6 +20,7 @@ The function base and returns a list of length k, to be used for k-fold cross va
 \examples{
 data <- iris
 data$Species <- as.character(data$Species)
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 data$Y_pred <- sample(0:1,size=nrow(data),replace=TRUE)

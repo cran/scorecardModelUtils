@@ -50,6 +50,7 @@ The function runs a grid search with k-fold cross validation to arrive at best p
 }
 \examples{
 data <- iris
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 gbm_params_list <- gradient_boosting_parameters(base = data,target = "Y",ntree = 2,depth = 2,

@@ -729,6 +729,7 @@ cv_table <- function(base,column_name){
 #' @return \item{dropped_var_tab}{CV correlation value for dropped variables as a dataframe}
 #' @return \item{threshold}{threshold CV value used as input parameter}
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' cv_tab_list <- cv_table(data, c("Species", "Sepal.Length"))
@@ -785,6 +786,7 @@ cv_filter <- function(cv_table,iv_table,threshold){
 #' @return \item{dropped_var_list}{variables dropped from the model in vif filter step}
 #' @return \item{threshold}{threshold }
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' vif_data_list <- vif_filter(base = data,target = "Y")
@@ -827,6 +829,7 @@ vif_filter <- function(base,target,threshold=2){
 #' @param setscore (optional) input for setting offset (default value is 660)
 #' @return The function returns a dataframe with the coefficients and scalled scores for each class of all explanatory variables of the model.
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' x <- c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width")
@@ -886,6 +889,7 @@ scalling <- function(base,target,model,point=15,factor=2,setscore=660){
 #' @param scalling dataframe of class scalling with atleast two columns - Variable, Category, Coefficient, D(i,j)_hat, Score
 #' @return The function returns a dataframe with classes converted to scores and the final score for each record in the input dataframe.
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' x <- c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width")
@@ -939,6 +943,7 @@ scoring <- function(base,target,scalling){
 #' @param model (optional) object of type lm or glm model, required only if "col_pred"=FALSE (default value is FALSE)
 #' @param brk (optional) array of break points of predicted value (default value is FALSE)
 #' @param quantile_pt (optional) number of quantiles to divide the predicted value range (default value is 10)
+#' @param event_rate_direction (optional) directionality of event rate with increasing value of predicted column, to be chosen among "increasing" or "decreasing" (default value is decreasing)
 #' @return An object of class "gini_table" is a list containing the following components:
 #' @return \item{prediction}{base with the predicted value as a dataframe}
 #' @return \item{gini_tab}{gini table as a dataframe}
@@ -948,8 +953,10 @@ scoring <- function(base,target,scalling){
 #' @return \item{breaks}{break points}
 #' @examples data <- iris
 #' data$Species <- as.character(data$Species)
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y_pred <- sample(300:900,size=nrow(data),replace=TRUE)
 #' gini_tab_list <- gini_table(base = data,target = "Y",col_pred = "Y_pred",quantile_pt = 10)
@@ -964,7 +971,7 @@ scoring <- function(base,target,scalling){
 #' @importFrom stats predict quantile
 #' @importFrom ggplot2 ggplot aes_ geom_line aes geom_segment
 #' @export
-gini_table <- function(base,target,col_pred=F,model=F,brk=F,quantile_pt=10){
+gini_table <- function(base,target,col_pred=F,model=F,brk=F,quantile_pt=10,event_rate_direction='decreasing'){
   if(model!=F){
     base$predicted <- predict(model,newdata = base,type = "response")} else {
       p <- which(names(base)==col_pred)
@@ -981,7 +988,11 @@ gini_table <- function(base,target,col_pred=F,model=F,brk=F,quantile_pt=10){
   names(tab) <- c("Band","Non_event","Event")
   tab$Lower_open_bound <- gsub("\\(","",unlist(str_split(tab$Band,","))[seq(1,nrow(tab)*2,by=2)])
   tab$Upper_closed_bound <- gsub("]","",unlist(str_split(tab$Band,","))[seq(2,nrow(tab)*2,by=2)])
-  tab <- tab[order(as.numeric(tab$Upper_closed_bound)),]
+  if(event_rate_direction=='decreasing'){
+    tab <- tab[order(as.numeric(tab$Upper_closed_bound)),]
+  } else if(event_rate_direction=='increasing') {
+    tab <- tab[order(-as.numeric(tab$Upper_closed_bound)),]
+  }
   tab$Total <- tab$Non_event+tab$Event
   tab <- tab[,c(4,5,1,6,2,3)]
   tab$Event_rate <- tab$Event/tab$Total
@@ -1026,6 +1037,7 @@ gini_table <- function(base,target,col_pred=F,model=F,brk=F,quantile_pt=10){
 #' @return \item{f1_score}{F1 score}
 #' @examples data <- iris
 #' data$Species <- as.character(data$Species)
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' data$Y_pred <- sample(0:1,size=nrow(data),replace=TRUE)
@@ -1072,6 +1084,7 @@ fn_conf_mat <- function(base,observed_col,predicted_col,event){
 #' @return \item{root_mean_sq_error}{root mean squared error between observed and predicted value}
 #' @examples data <- iris
 #' data$Species <- as.character(data$Species)
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' data$Y_pred <- sample(0:1,size=nrow(data),replace=TRUE)
@@ -1103,6 +1116,7 @@ fn_error <- function(base,observed_col,predicted_col){
 #' @return The function a list of length k, each holding an array of index/row number for sampling the base.
 #' @examples data <- iris
 #' data$Species <- as.character(data$Species)
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' data$Y_pred <- sample(0:1,size=nrow(data),replace=TRUE)
@@ -1148,6 +1162,7 @@ fn_cross_index <- function(base,k){
 #' @return \item{best_cost}{cost parameter of the optimal solution}
 #' @return \item{runtime}{runtime of the entire process}
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' svm_params_list <- support_vector_parameters(base = data,target = "Y",gamma = 0.1,
@@ -1225,6 +1240,7 @@ support_vector_parameters <- function(base,target,scale=T,kernel,degree=2,gamma,
 #' @return \item{best_nodesize}{nodesize parameter of the optimal solution}
 #' @return \item{runtime}{runtime of the entire process}
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' rf_params_list <- random_forest_parameters(base = data,target = "Y",
@@ -1322,6 +1338,7 @@ random_forest_parameters <- function(base,target,model_type,ntree,mtry,maxnodes=
 #' @return \item{best_bag_fraction}{bag_fraction parameter of the optimal solution}
 #' @return \item{runtime}{runtime of the entire process}
 #' @examples data <- iris
+#' suppressWarnings(RNGversion('3.5.0'))
 #' set.seed(11)
 #' data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 #' gbm_params_list <- gradient_boosting_parameters(base = data,target = "Y",ntree = 2,depth = 2,

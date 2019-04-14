@@ -29,6 +29,7 @@ The function returns a list of variables that can be dropped because of high cor
 }
 \examples{
 data <- iris
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 cv_tab_list <- cv_table(data, c("Species", "Sepal.Length"))

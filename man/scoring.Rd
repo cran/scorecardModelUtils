@@ -21,6 +21,7 @@ The function takes the data, with each variable as class. The dataframe of class
 }
 \examples{
 data <- iris
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 x <- c("Sepal.Length","Sepal.Width","Petal.Length","Petal.Width")

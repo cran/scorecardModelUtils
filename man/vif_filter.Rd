@@ -31,6 +31,7 @@ The function takes a dataset with the starting variables and target only. The vi
 }
 \examples{
 data <- iris
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 vif_data_list <- vif_filter(base = data,target = "Y")

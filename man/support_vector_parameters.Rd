@@ -48,6 +48,7 @@ The function runs a grid search with k-fold cross validation to arrive at best p
 }
 \examples{
 data <- iris
+suppressWarnings(RNGversion('3.5.0'))
 set.seed(11)
 data$Y <- sample(0:1,size=nrow(data),replace=TRUE)
 svm_params_list <- support_vector_parameters(base = data,target = "Y",gamma = 0.1,
